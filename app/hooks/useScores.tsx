@@ -1,11 +1,27 @@
 import { useState } from "react"
 import type { Score } from "../components/ScoresTable";
 
+class idGenerator {
+
+    #currentId: number
+
+    constructor() {
+        this.#currentId = 0;
+    }
+
+    getNextId (){
+        this.#currentId++;
+        return this.#currentId;
+    }
+}
+
+const idGeneratorInstance = new idGenerator();
+
 const useScores = () => {
     const [scores, setScores] = useState<Score[]>([]);
-    const addPlayer = (id:number, name:string) => {
+    const addPlayer = (name: string) => {
         const newScores = [...scores, {
-            id,
+            id: idGeneratorInstance.getNextId(),
             name,
             score: 0,
             earning: 0,
@@ -14,7 +30,7 @@ const useScores = () => {
     }
 
 
-    return {scores, modifiers : { addPlayer}};
+    return { scores, modifiers: { addPlayer } };
 }
 
 export default useScores;
