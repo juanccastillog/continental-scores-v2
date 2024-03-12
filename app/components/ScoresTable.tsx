@@ -1,13 +1,9 @@
 import React from "react"
-export interface Score {
-    id: number,
-    name: string,
-    score: number,
-    earning: number,
-}
+
+import type { GameScore } from "../hooks/useScores"
 
 interface ScoresTableProps {
-    scores?: Score[]
+    scores?: GameScore[]
 }
 
 export const ScoresTable = ({ scores }: ScoresTableProps) => (
@@ -23,8 +19,8 @@ export const ScoresTable = ({ scores }: ScoresTableProps) => (
             <tbody>
                 {
                     scores?.map(score => (
-                        <tr key={score.id}>
-                            <td className="py-2 px-4">{score.name}</td>
+                        <tr key={score.playerId}>
+                            <td className="py-2 px-4">{score.playerName}</td>
                             <td className="py-2 px-4">{score.score}</td>
                             <td className="py-2 px-4">{score.earning}</td>
                         </tr>

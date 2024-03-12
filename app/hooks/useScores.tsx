@@ -1,7 +1,87 @@
-import { useState } from "react"
-import type { Score } from "../components/ScoresTable";
+import { useState, useMemo } from "react"
 
-class idGenerator {
+
+interface Player {
+    id: number,
+    name: string,
+}
+
+interface DealScore {
+    playerId: number,
+    playerName: string,
+    points: number,
+}
+
+export interface Deal {
+    id: number,
+    winnerEarning: number,
+    winnerPlayerId: number,
+    scores: DealScore[],
+}
+
+export interface GameScore {
+    playerId: number,
+    playerName: string,
+    score: number,
+    earning: number,
+}
+
+
+class DefaultDealFactory {
+
+    #nextDealIndex = 0;
+    #defaultDeals: Deal[] = [
+        {
+            id: 1,
+            winnerEarning: 500,
+            winnerPlayerId: 0,
+            scores: [],
+        },
+        {
+            id: 2,
+            winnerEarning: 1000,
+            winnerPlayerId: 0,
+            scores: [],
+        },
+        {
+            id: 3,
+            winnerEarning: 1500,
+            winnerPlayerId: 0,
+            scores: [],
+        },
+        {
+            id: 4,
+            winnerEarning: 2000,
+            winnerPlayerId: 0,
+            scores: [],
+        },
+        {
+            id: 5,
+            winnerEarning: 2500,
+            winnerPlayerId: 0,
+            scores: [],
+        },
+        {
+            id: 6,
+            winnerEarning: 3000,
+            winnerPlayerId: 0,
+            scores: [],
+        },
+        {
+            id: 7,
+            winnerEarning: 3500,
+            winnerPlayerId: 0,
+            scores: [],
+        }
+    ];
+
+    getNextDeal() {
+        return this.#defaultDeals[this.#nextDealIndex++];
+    }
+}
+
+
+class IdGenerator {
 
     #currentId: number
 
@@ -9,28 +89,101 @@ class idGenerator {
         this.#currentId = 0;
     }
 
-    getNextId (){
+    getNextId() {
         this.#currentId++;
         return this.#currentId;
     }
 }
 
-const idGeneratorInstance = new idGenerator();
+const idGeneratorInstance = new IdGenerator();
+
+const getPlayerEarningInDeal = (playerId: number, deal: Deal): number => {
+    if (deal.winnerPlayerId === playerId) {
+        return deal.winnerEarning;
+    }
+    return -deal.winnerEarning * (deal.scores.length - 1);
+}
+
+const calculateScores = (players: Player[], deals: Deal[]): GameScore[] => {
+    return players.map(player => {
+        return {
+            playerId: player.id,
+            playerName: player.name,
+            score: deals.reduce((scoreSum, deal) => scoreSum + (deal.scores.find(score => score.playerId === player.id)?.points || 0), 0),
+            earning: deals.reduce((earningSum, deal) => earningSum + getPlayerEarningInDeal(player.id, deal), 0),
+        }
+    })
+}
+
+const defaultDealFactory = new DefaultDealFactory();
 
 const useScores = () => {
-    const [scores, setScores] = useState<Score[]>([]);
+    const [players, setPlayers] = useState<Player[]>([]);
+    const [deals, setDeals] = useState<Deal[]>([]);
+
+
     const addPlayer = (name: string) => {
-        const newScores = [...scores, {
-            id: idGeneratorInstance.getNextId(),
+        const newPlayerId = idGeneratorInstance.getNextId();
+        const newPlayers = [...players, {
+            id: newPlayerId,
             name,
-            score: 0,
-            earning: 0,
         }];
-        setScores(newScores)
+        setPlayers(newPlayers);
+        const newDeals = deals.map(deal => ({ ...deal, scores: [...deal.scores, { playerId: newPlayerId, playerName: name, points: 0 }] }));
+        setDeals(newDeals)
+    };
+
+    const addDeal = () => {
+        const nextDeal = defaultDealFactory.getNextDeal();
+        nextDeal.scores = players.map(player => ({
+           playerId: player.id,
+           playerName: player.name,
+           points: 0, 
+        }))
+        setDeals([...deals, nextDeal]);
+        return nextDeal.id;
     }
 
+    const changePoints = (dealId: number, playerId: number, points: number) => {
+        setDeals(deals.map(
+            deal => {
+                if (deal.id === dealId) {
+                    return {
+                        ...deal,
+                        scores: deal.scores.map(score => {
+                            if(score.playerId === playerId){
+                                return {
+                                    ...score,
+                                    points
+                                }
+                            }
+                            return score;
+                        })
+                    }
+                }
+                return deal;
+            }
+        ))
+    }
 
-    return { scores, modifiers: { addPlayer } };
+    const changeWinner = (dealId: number, winnerPlayerId: number) => {
+        setDeals(deals.map(
+            deal => {
+                if (deal.id === dealId) {
+                    return {
+                        ...deal,
+                        winnerPlayerId,
+                    }
+                }
+                return deal;
+            }
+        ))       
+    }
+
+    const scores = useMemo(() => calculateScores(players, deals), [players, deals]);
+
+
+    return { scores, deals, modifiers: { addPlayer, addDeal, changePoints, changeWinner } };
 }
 
 export default useScores;

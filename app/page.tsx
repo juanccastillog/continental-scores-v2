@@ -1,29 +1,34 @@
 'use client'
-import AddPlayer from "./components/AddPlayer";
-import { ScoresTable } from "./components/ScoresTable";
-import useScores from "./hooks/useScores";
+import { useState } from "react";
 
+import GameManager from "./components/GameManager";
+import DealManager from "./components/DealManager";
+import useScores from "./hooks/useScores";
 
 
 export default function Home() {
 
-  const { scores, modifiers } = useScores();
+  const { scores, modifiers, deals } = useScores();
+  const [viewedDealId, setViewdDealId] = useState(0);
 
   const handleAddPlayerName = (name: string) => {
     modifiers.addPlayer(name)
   }
 
+  const handleAddDeal = () => {
+    setViewdDealId(modifiers.addDeal());
+  }
+
+  const handleChangePoints = (dealId: number, playerId: number, newPoints: number) => {
+    modifiers.changePoints(dealId, playerId, newPoints);
+  }
+
+  const viewedDeal = (viewedDealId !== 0)? deals.find(deal => deal.id === viewedDealId) : null;
+
   return (
     <main >
-      <div className="flex flex-col">
-        <div className="h-14" />
-        <div className="flex w-full justify-center">
-          {scores?.length > 0 && <ScoresTable scores={scores} />}
-        </div>
-        <div className="flex w-full justify-center mt-5">
-          {<AddPlayer onAddPlayerName={handleAddPlayerName} />}
-        </div>
-      </div>
+      {viewedDealId === 0 &&<GameManager scores={scores} deals={deals} onAddPlayerName={handleAddPlayerName} onAddDeal={handleAddDeal} onEditDeal={(dealId)=>setViewdDealId(dealId)}/>}
+      {viewedDeal && <DealManager deal = { viewedDeal} onChangePoints={handleChangePoints} onChangeWinner={modifiers.changeWinner} onBack={()=>setViewdDealId(0)}/>}
     </main>
   )
 }
