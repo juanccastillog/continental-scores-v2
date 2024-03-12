@@ -35,4 +35,4 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 
 ## Deploy on GH pages
 
-commit or merge to master and push
+commit or merge to master and push.
