@@ -29,7 +29,7 @@ const DealManager = ({ deal, onChangePoints, onChangeWinner, onBack }: DealManag
                 <div className="flex justify-center">
                     <form className="flex flex-col bg-white space-y-4" style={{ maxWidth: '250px' }}>
                         {deal.scores.map(dealScore => (
-                            <div className="flex items-center h-10 space-x-2">
+                            <div className="flex items-center h-10 space-x-2" key={`${deal.id}${dealScore.playerId}`}>
                                 <div className="flex h-7 w-24"><p className="h-7 overflow-hidden py-0.5">{dealScore.playerName}</p></div>
                                 <div className="flex">
                                     <input

@@ -31,6 +31,7 @@ const GameManager = ({ scores, deals, onAddPlayerName, onAddDeal, onEditDeal }: 
                 {
                     deals.map(deal => (
                     <a 
+                        key={deal.id}
                         href="#" 
                         className="text-blue-500 hover:text-blue-700 focus:text-blue-700 focus:outline-none" 
                         onClick={()=>onEditDeal(deal.id)}
