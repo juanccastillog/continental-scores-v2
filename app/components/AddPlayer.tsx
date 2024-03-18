@@ -18,11 +18,12 @@ const AddPlayer = ({ onAddPlayerName }: AddPlayerProps) => {
     const handleAddPlayerName = () => {
         if (name) {
             onAddPlayerName(name);
+            setName('');
         }
     }
     return (
         <div className="flex flex-row">
-            <AddPlayerInput onChange={handleNameChange} />
+            <AddPlayerInput name={name} onChange={handleNameChange} onKeyDownEnter={handleAddPlayerName}/>
             <div className="w-5" />
             <AddPlayerButton onClick={handleAddPlayerName} />
         </div>

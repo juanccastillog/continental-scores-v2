@@ -115,6 +115,26 @@ const calculateScores = (players: Player[], deals: Deal[]): GameScore[] => {
     })
 }
 
+const getPlayerThatHasFewerPointsThanAllOthers = (deal: Deal | undefined) => {
+    if(!deal){
+        return null;
+    }
+    let pointsMin = Number.POSITIVE_INFINITY;
+    let minIsUnique = false;
+    let minPlayer = null;
+    for (let i = 0; i < deal.scores?.length || 0; i++ ){
+        if(pointsMin === deal.scores[i].points){
+            minIsUnique = false;
+        }
+        if(deal.scores[i].points < pointsMin){
+            pointsMin = deal.scores[i].points;
+            minIsUnique = true;
+            minPlayer = deal.scores[i].playerId;
+        }
+    }
+    return minIsUnique? minPlayer : null;
+}
+
 const defaultDealFactory = new DefaultDealFactory();
 
 const useScores = () => {
@@ -144,8 +164,24 @@ const useScores = () => {
         return nextDeal.id;
     }
 
+    const innerChangeWinner = (currentDeals: Deal[], dealId: number, winnerPlayerId: number) => {
+        setDeals(currentDeals.map(
+            deal => {
+                if (deal.id === dealId) {
+                    return {
+                        ...deal,
+                        winnerPlayerId,
+                    }
+                }
+                return deal;
+            }
+        ))       
+    }
+
+    const changeWinner = (dealId: number, winnerPlayerId: number) => innerChangeWinner(deals, dealId, winnerPlayerId);
+
     const changePoints = (dealId: number, playerId: number, points: number) => {
-        setDeals(deals.map(
+        const newDeals = deals.map(
             deal => {
                 if (deal.id === dealId) {
                     return {
@@ -163,21 +199,15 @@ const useScores = () => {
                 }
                 return deal;
             }
-        ))
-    }
-
-    const changeWinner = (dealId: number, winnerPlayerId: number) => {
-        setDeals(deals.map(
-            deal => {
-                if (deal.id === dealId) {
-                    return {
-                        ...deal,
-                        winnerPlayerId,
-                    }
-                }
-                return deal;
+        );
+        setDeals(newDeals);
+        const changedDeal = newDeals.find(deal => deal.id === dealId);
+        if(changedDeal?.winnerPlayerId === 0){
+            const possibleWinner = getPlayerThatHasFewerPointsThanAllOthers(changedDeal);
+            if(possibleWinner!== null && possibleWinner > 0){
+                innerChangeWinner(newDeals, changedDeal?.id, possibleWinner);
             }
-        ))       
+        }
     }
 
     const scores = useMemo(() => calculateScores(players, deals), [players, deals]);
