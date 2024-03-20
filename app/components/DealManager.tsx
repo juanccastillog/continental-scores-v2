@@ -6,11 +6,11 @@ interface DealManagerProps {
     deal: Deal,
     onBack: () => void,
     onChangePoints: (dealId: number, playerId: number, newPoints: number) => void,
-    onChangeWinnerEarning?: (dealId: number) => void,
+    onChangeWinnerEarning: (dealId: number, newEarning: number) => void,
     onChangeWinner: (dealId: number, playerId: number) => void,
 }
 
-const DealManager = ({ deal, onChangePoints, onChangeWinner, onBack }: DealManagerProps) => (
+const DealManager = ({ deal, onChangePoints, onChangeWinner, onChangeWinnerEarning, onBack }: DealManagerProps) => (
     <div className="flex justify-center bg-slate-50 h-screen">
         <div className="flex flex-col bg-white w-full max-w-md">
             <div className="flex flex-row justify-between">
@@ -28,15 +28,26 @@ const DealManager = ({ deal, onChangePoints, onChangeWinner, onBack }: DealManag
             </div>
             <div className="flex justify-center">
                 <form className="flex flex-col bg-white space-y-4" style={{ maxWidth: '250px' }}>
+                    <div className="flex justify-start gap-3">
+                        <label>Apuesta</label>
+                        <input
+                            className="w-16 h-7 border border-gray-300 rounded-md px-1 py-2 focus:outline-none focus:border-indigo-500 text-right"
+                            value={deal.winnerEarning}
+                            onChange={event => { onChangeWinnerEarning(deal.id, parseInt(event.target.value)) }}
+                        />
+                    </div>
+                    <div className="flex justify-end">
+                        <label>Ganador?</label>
+                    </div>
                     {deal.scores.map((dealScore, i) => (
                         <div className="flex items-center h-10 space-x-2" key={`${deal.id}${dealScore.playerId}`}>
-                            <div className="flex h-7 w-24"><p className="h-7 overflow-hidden py-0.5">{dealScore.playerName}</p></div>
+                            <div className="flex h-7 w-24"><p className="h-7 overflow-hidden py-0.5 text-black">{dealScore.playerName}</p></div>
                             <div className="flex">
                                 <PointsInput
                                     value={dealScore.points}
                                     onChange={event => {
                                         const newPoints = parseInt(event.target.value, 10);
-                                        if(!isNaN(newPoints)){
+                                        if (!isNaN(newPoints)) {
                                             onChangePoints(deal.id, dealScore.playerId, parseInt(event.target.value, 10));
                                         }
                                     }}

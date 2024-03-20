@@ -8,11 +8,11 @@ interface ScoresTableProps {
 
 export const ScoresTable = ({ scores }: ScoresTableProps) => (
     <>
-        <table className="w-300 bg-white shadow-md rounded-lg overflow-hidden">
+        <table className="w-80 bg-white shadow-md rounded-lg overflow-hidden text-black">
             <thead className="bg-gray-200">
                 <tr>
                     <th className="py-2 px-4">Nombre</th>
-                    <th className="py-2 px-4">Puntuación</th>
+                    <th className="py-2 px-4">Puntos</th>
                     <th className="py-2 px-4">Ganancia</th>
                 </tr>
             </thead>

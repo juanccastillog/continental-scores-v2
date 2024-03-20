@@ -19,7 +19,8 @@ const AddPlayerInput = ({ onChange, onKeyDownEnter, name }: AddPlayerInputProps)
     return (
         <input
             value={name}
-            className="border border-gray-400 border-solid border-1 p-3"
+            placeholder="Nombre"
+            className="border border-gray-400 border-solid border-1 px-3 text-gray-800 w-40"
             onChange={event => onChange(event.target.value)}
             onKeyDown={handleKeyDown}
         />

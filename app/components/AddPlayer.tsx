@@ -22,7 +22,7 @@ const AddPlayer = ({ onAddPlayerName }: AddPlayerProps) => {
         }
     }
     return (
-        <div className="flex flex-row">
+        <div className="flex flex-row w-64">
             <AddPlayerInput name={name} onChange={handleNameChange} onKeyDownEnter={handleAddPlayerName}/>
             <div className="w-5" />
             <AddPlayerButton onClick={handleAddPlayerName} />

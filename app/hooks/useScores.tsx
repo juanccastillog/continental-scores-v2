@@ -99,9 +99,9 @@ const idGeneratorInstance = new IdGenerator();
 
 const getPlayerEarningInDeal = (playerId: number, deal: Deal): number => {
     if (deal.winnerPlayerId === playerId) {
-        return deal.winnerEarning;
+        return deal.winnerEarning * (deal.scores.length - 1);
     }
-    return -deal.winnerEarning * (deal.scores.length - 1);
+    return -deal.winnerEarning;
 }
 
 const calculateScores = (players: Player[], deals: Deal[]): GameScore[] => {
@@ -116,23 +116,23 @@ const calculateScores = (players: Player[], deals: Deal[]): GameScore[] => {
 }
 
 const getPlayerThatHasFewerPointsThanAllOthers = (deal: Deal | undefined) => {
-    if(!deal){
+    if (!deal) {
         return null;
     }
     let pointsMin = Number.POSITIVE_INFINITY;
     let minIsUnique = false;
     let minPlayer = null;
-    for (let i = 0; i < deal.scores?.length || 0; i++ ){
-        if(pointsMin === deal.scores[i].points){
+    for (let i = 0; i < deal.scores?.length || 0; i++) {
+        if (pointsMin === deal.scores[i].points) {
             minIsUnique = false;
         }
-        if(deal.scores[i].points < pointsMin){
+        if (deal.scores[i].points < pointsMin) {
             pointsMin = deal.scores[i].points;
             minIsUnique = true;
             minPlayer = deal.scores[i].playerId;
         }
     }
-    return minIsUnique? minPlayer : null;
+    return minIsUnique ? minPlayer : null;
 }
 
 const defaultDealFactory = new DefaultDealFactory();
@@ -156,9 +156,9 @@ const useScores = () => {
     const addDeal = () => {
         const nextDeal = defaultDealFactory.getNextDeal();
         nextDeal.scores = players.map(player => ({
-           playerId: player.id,
-           playerName: player.name,
-           points: 0, 
+            playerId: player.id,
+            playerName: player.name,
+            points: 0,
         }))
         setDeals([...deals, nextDeal]);
         return nextDeal.id;
@@ -175,7 +175,7 @@ const useScores = () => {
                 }
                 return deal;
             }
-        ))       
+        ))
     }
 
     const changeWinner = (dealId: number, winnerPlayerId: number) => innerChangeWinner(deals, dealId, winnerPlayerId);
@@ -187,7 +187,7 @@ const useScores = () => {
                     return {
                         ...deal,
                         scores: deal.scores.map(score => {
-                            if(score.playerId === playerId){
+                            if (score.playerId === playerId) {
                                 return {
                                     ...score,
                                     points
@@ -202,18 +202,31 @@ const useScores = () => {
         );
         setDeals(newDeals);
         const changedDeal = newDeals.find(deal => deal.id === dealId);
-        if(changedDeal?.winnerPlayerId === 0){
+        if (changedDeal?.winnerPlayerId === 0) {
             const possibleWinner = getPlayerThatHasFewerPointsThanAllOthers(changedDeal);
-            if(possibleWinner!== null && possibleWinner > 0){
+            if (possibleWinner !== null && possibleWinner > 0) {
                 innerChangeWinner(newDeals, changedDeal?.id, possibleWinner);
             }
         }
     }
 
+    const changeWinnerEarning = (dealId: number, newEarning: number) => {
+        const newDeals: Deal[] = deals.map(deal => {
+            if (deal.id === dealId) {
+                return {
+                    ...deal,
+                    winnerEarning: newEarning
+                }
+            };
+            return deal;
+        });
+        setDeals(newDeals);
+    }
+
     const scores = useMemo(() => calculateScores(players, deals), [players, deals]);
 
 
-    return { scores, deals, modifiers: { addPlayer, addDeal, changePoints, changeWinner } };
+    return { scores, deals, modifiers: { addPlayer, addDeal, changePoints, changeWinner, changeWinnerEarning } };
 }
 
 export default useScores;

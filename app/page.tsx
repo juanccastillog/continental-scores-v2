@@ -23,12 +23,19 @@ export default function Home() {
     modifiers.changePoints(dealId, playerId, newPoints);
   }
 
-  const viewedDeal = (viewedDealId !== 0)? deals.find(deal => deal.id === viewedDealId) : null;
+  const viewedDeal = (viewedDealId !== 0) ? deals.find(deal => deal.id === viewedDealId) : null;
 
   return (
     <main >
-      {viewedDealId === 0 &&<GameManager scores={scores} deals={deals} onAddPlayerName={handleAddPlayerName} onAddDeal={handleAddDeal} onEditDeal={(dealId)=>setViewdDealId(dealId)}/>}
-      {viewedDeal && <DealManager deal = { viewedDeal} onChangePoints={handleChangePoints} onChangeWinner={modifiers.changeWinner} onBack={()=>setViewdDealId(0)}/>}
+      {viewedDealId === 0 && <GameManager scores={scores} deals={deals} onAddPlayerName={handleAddPlayerName} onAddDeal={handleAddDeal} onEditDeal={(dealId) => setViewdDealId(dealId)} />}
+      {viewedDeal &&
+        <DealManager
+          deal={viewedDeal}
+          onChangePoints={handleChangePoints}
+          onChangeWinnerEarning={modifiers.changeWinnerEarning}
+          onChangeWinner={modifiers.changeWinner}
+          onBack={() => setViewdDealId(0)}
+        />}
     </main>
   )
 }

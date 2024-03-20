@@ -15,6 +15,7 @@ interface GameManagerProps {
 }
 
 const GameManager = ({ scores, deals, onAddPlayerName, onAddDeal, onEditDeal }: GameManagerProps) => {
+    const allDealsAreDone = !deals.find(deal => deal.winnerPlayerId === 0)
     return (
         <div className="flex flex-col">
             <div className="h-14" />
@@ -24,21 +25,34 @@ const GameManager = ({ scores, deals, onAddPlayerName, onAddDeal, onEditDeal }: 
             <div className="flex w-full justify-center mt-5">
                 {<AddPlayer onAddPlayerName={onAddPlayerName} />}
             </div>
-            <div className="flex w-full justify-center mt-5">
-                <a href="#" className="text-blue-500 hover:text-blue-700 focus:text-blue-700 focus:outline-none" onClick={onAddDeal}>
-                    Agregar juego ...
-                </a>
-                {
-                    deals.map(deal => (
-                    <a 
-                        key={deal.id}
-                        href="#" 
-                        className="text-blue-500 hover:text-blue-700 focus:text-blue-700 focus:outline-none" 
-                        onClick={()=>onEditDeal(deal.id)}
-                        >
-                            Editar juego {deal.id}...
-                        </a>))
-                }
+            <div className="flex justify-center">
+                <div className="flex flex-col py-5 w-80">
+                    {
+                        allDealsAreDone &&
+                        <a href="#" className="text-blue-500 hover:text-blue-700 focus:text-blue-700 focus:outline-none" onClick={onAddDeal}>
+                            Agregar juego ...
+                        </a>
+                    }
+                    {
+                        !allDealsAreDone &&
+                        <label>
+                            Termina el juego para poder agregar uno nuevo
+                        </label>
+                    }
+                    {
+                        deals.map(deal => (
+                            <div key={deal.id}>
+                                <a
+                                    href="#"
+                                    className="text-blue-500 hover:text-blue-700 focus:text-blue-700 focus:outline-none"
+                                    onClick={() => onEditDeal(deal.id)}
+                                >
+                                    Editar juego {deal.id}...
+                                </a>
+                            </div>
+                        ))
+                    }
+                </div>
             </div>
         </div>
     );
